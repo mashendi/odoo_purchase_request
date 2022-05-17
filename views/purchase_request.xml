@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="purchase_request_sequence" model="ir.sequence">
+        <field name="name">Purchase Request Sequence</field>
+        <field name="code">purchase.request</field>
+        <field name="active">TRUE</field>
+        <field name="prefix">PRQ-</field>
+        <field name="padding">3</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="view_purchase_request_form" model="ir.ui.view">
+        <field name="name">purchase.request.form</field>
+        <field name="model">purchase.request</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Request">
+                <header>
+                    <button
+                            name="button_confirmed"
+                            states="draft"
+                            string="Confirm"
+                            type="object"
+                    />
+                    <field
+                            name="state"
+                            widget="statusbar"
+                            statusbar_visible="draft,confirmed"
+                            statusbar_colors='{"confirmed":"blue"}'
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_view_purchase_order" class="oe_stat_button"
+                                icon="fa-shopping-cart">
+                            <field name="purchase_count" widget="statinfo" string="Purchases"/>
+                        </button>
+                    </div>
+                    <div class="oe_edit_only">
+                        <label for="name" class="oe_inline"/>
+                    </div>
+                    <h1>
+                        <field name="name" class="oe_inline"/>
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="created_by"/>
+                            <field name="requested_by"/>
+                            <field name="analytic_account_id"/>
+                        </group>
+                        <group>
+                            <field name="creation_date"/>
+                            <field name="requested_on"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="vendor_id"/>
+                                    <field name="product_qty"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="product_uom_category_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_purchase_request_tree" model="ir.ui.view">
+        <field name="name">purchase.request.tree</field>
+        <field name="model">purchase.request</field>
+        <field name="arch" type="xml">
+            <tree
+                    decoration-info="state == 'draft'"
+                    decoration-muted="state == 'confirmed'"
+                    name="Purchase Request"
+                    class="o_purchase_order"
+            >
+                <field name="name"/>
+                <field name="creation_date"/>
+                <field name="created_by" widget="many2one_avatar_user"/>
+                <field name="requested_by" widget="many2one_avatar_user"/>
+                <field name="requested_on" optional="hide"/>
+                <field
+                        name="state"
+                        widget="badge"
+                        decoration-success="state in ('confirmed')"
+                        decoration-muted="state == 'draft'"
+                />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="purchase_request_form_action">
+        <field name="name">Purchase Requests</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to start a new purchase request process.
+            </p>
+        </field>
+    </record>
+    <menuitem
+            id="menu_purchase_request_pro_mgt"
+            parent="purchase.menu_purchase_root"
+            action="purchase_request_form_action"
+    />
+</odoo>
